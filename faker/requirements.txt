@@ -1,0 +1,6 @@
+certifi==2025.10.5
+elastic-transport==8.17.1
+elasticsearch==8.6.2
+Faker==37.11.0
+tzdata==2025.2
+urllib3==2.5.0
