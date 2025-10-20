@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -28,4 +26,4 @@ class Film(BaseModel):
     directors: list
     actors: list
     writers: list
-    file_link: Optional[str] | None
+    file_link: str | None
