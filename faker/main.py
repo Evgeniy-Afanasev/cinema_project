@@ -95,7 +95,7 @@ genres = fake.words(nb=101, unique=True)
 
 def generate_document():
     return {
-        "id": fake.uuid4(),
+        "uuid": fake.uuid4(),
         "imdb_rating": round(random.uniform(1.0, 10.0), 1),
         "genres": random.sample(genres, random.randint(1, 10)),
         "title": fake.sentence(nb_words=3),

@@ -80,19 +80,37 @@ class BaseService[M: BaseModel]:
 
     async def _get_model_from_elastic(self, model_id: str) -> M | None:
         """
-        Retrieve a model from Elasticsearch by its unique identifier.
+        Retrieves a model from Elasticsearch using the UUID field in documents.
 
         Parameters:
-        - model_id (str): The unique identifier of the model.
+        - model_uuid (str): The value of the 'uuid' field to search for.
 
         Returns:
-        - An instance of the model if found, otherwise None.
+        - An instance of the model class if found, or None if not found.
         """
         try:
-            doc = await self.elastic.get(index=self.index, id=model_id)
+
+            response = await self.elastic.search(
+                index=self.index,
+                body={
+                    "query": {
+                        "term": {
+                            "uuid.keyword": model_id
+                        }
+                    },
+                    "size": 1
+                }
+            )
+
+            hits = response['hits']['hits']
+
+            if len(hits) > 0:
+                source_data = hits[0]['_source']
+                return self.model_class(**source_data)
+
         except NotFoundError:
             return None
-        return self.model_class(**doc["_source"])
+        return None
 
     async def _get_all_from_elastic(self, model_filter: BaseFilter) -> list[M]:
         """
@@ -112,7 +130,8 @@ class BaseService[M: BaseModel]:
         return [self.model_class(**model["_source"]) for model in doc["hits"]["hits"]]
 
     @staticmethod
-    async def _enrich_query_with_search(model_filter: BaseFilter, query_body: dict[str, Any], field: str) -> dict[str, Any]:
+    async def _enrich_query_with_search(model_filter: BaseFilter, query_body: dict[str, Any], field: str) -> dict[
+        str, Any]:
         """
         Enrich the Elasticsearch query with a fuzzy search.
 
@@ -192,7 +211,7 @@ class BaseService[M: BaseModel]:
         if isinstance(deserialized_data, list):
             return [self.model_class.model_validate_json(item) for item in deserialized_data]
 
-        return self.model_class.model_validate_json(deserialized_data)
+        return self.model_class(**deserialized_data)
 
     async def _put_to_cache(self, cache_key: str, model: M | list[M]):
         """

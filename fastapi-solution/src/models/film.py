@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -10,14 +12,14 @@ class Film(BaseModel):
     - description (str | None): Содержание.
     - created (datetime): Дата создания.
     - imdb_rating (float | None): Рейтинг.
-    - genres (List[Genre]): Жанры.
-    - directors (List[Person]): Режиссёры.
-    - actors (List[Person]): Актёры.
-    - writers (List[Person]): Сценаристы.
-    - file_link (List[Person]): Ссылка на файл.
+    - genres (List): Жанры.
+    - directors (List): Режиссёры.
+    - actors (List): Актёры.
+    - writers (List): Сценаристы.
+    - file_link (str | None): Ссылка на файл.
     """
 
-    # uuid: str
+    uuid: str
     title: str
     description: str | None
     created: str
@@ -26,4 +28,4 @@ class Film(BaseModel):
     directors: list
     actors: list
     writers: list
-    file_link: str | None
+    file_link: Optional[str] | None
