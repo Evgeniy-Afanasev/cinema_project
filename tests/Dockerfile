@@ -7,4 +7,6 @@ COPY . .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt --no-cache-dir
 
-CMD ["python", "main.py"]
+ENV PYTHONPATH /app
+
+CMD ["pytest", "-v"]

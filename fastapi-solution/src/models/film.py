@@ -18,12 +18,15 @@ class Film(BaseModel):
     """
 
     uuid: str
-    title: str
-    description: str | None
-    created: str
     imdb_rating: float | None
     genres: list
+    title: str
+    description: str | None
+    directors_names: list
+    actors_names: list
+    writers_names: list
     directors: list
     actors: list
     writers: list
+    created: str
     file_link: str | None

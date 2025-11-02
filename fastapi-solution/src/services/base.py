@@ -95,7 +95,7 @@ class BaseService[M: BaseModel]:
                 body={
                     "query": {
                         "term": {
-                            "uuid.keyword": model_id
+                            "uuid": model_id
                         }
                     },
                     "size": 1

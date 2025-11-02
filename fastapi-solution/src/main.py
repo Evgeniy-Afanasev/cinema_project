@@ -7,6 +7,7 @@ from redis.asyncio import Redis
 from api.v1 import films
 from core.config import settings
 from db import elastic, redis
+from routes import health
 
 
 @asynccontextmanager
@@ -27,4 +28,5 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(health.router, tags=['health'])
 app.include_router(films.router, prefix='/api/v1/films', tags=['films'])

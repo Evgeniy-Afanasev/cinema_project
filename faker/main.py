@@ -1,3 +1,4 @@
+import json
 import time
 from elasticsearch import Elasticsearch, helpers
 from faker import Faker
@@ -9,6 +10,7 @@ fake = Faker()
 GENERATE_DOCS = int(os.getenv('GENERATE_DOCS', 10000))
 ELASTIC_HOST = os.getenv('ELASTIC_HOST', '127.0.0.1')
 ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
+ELASTIC_INDEX = os.getenv('ELASTIC_INDEX', 'movies')
 
 client = Elasticsearch(
     f"http://{ELASTIC_HOST}:{ELASTIC_PORT}",
@@ -67,22 +69,24 @@ def create_elastic_schema() -> dict:
         "mappings": {
             "dynamic": "strict",
             "properties": {
-                "id": {"type": "keyword"},
+                "uuid": {"type": "keyword"},
                 "imdb_rating": {"type": "float"},
                 "genres": {"type": "keyword"},
+                "file_link": {"type": "text"},
                 "title": {
                     "type": "text",
                     "analyzer": "ru_en",
                     "fields": {"raw": {"type": "keyword"}},
                 },
                 "description": {"type": "text", "analyzer": "ru_en"},
-                **{name: {"type": "text", "analyzer": "ru_en"} for name in
+                **{name: {"type": "keyword"} for name in
                    ["directors_names", "actors_names", "writers_names"]},
                 **{role: {"type": "nested", "dynamic": "strict",
                           "properties": {
                               "id": {"type": "keyword"},
                               "name": {"type": "text", "analyzer": "ru_en"}
                           }} for role in ["directors", "actors", "writers"]},
+                "created": {"type": "date"},
             },
         },
     }
@@ -97,15 +101,18 @@ def generate_document():
     return {
         "uuid": fake.uuid4(),
         "imdb_rating": round(random.uniform(1.0, 10.0), 1),
-        "genres": random.sample(genres, random.randint(1, 10)),
-        "title": fake.sentence(nb_words=3),
+        "genres": random.sample(genres, random.randint(1, 3)),  # Изменено на 1-3 жанра
+        "title": fake.sentence(nb_words=3)[:-1],
         "description": fake.text(max_nb_chars=200),
-        "directors_names": fake.name(),
-        "actors_names": fake.name(),
-        "writers_names": fake.name(),
-        "directors": [fake.name() for _ in range(random.randint(1, 3))],
-        "actors": [fake.name() for _ in range(random.randint(1, 5))],
-        "writers": [fake.name() for _ in range(random.randint(1, 3))],
+        "directors_names": [fake.name() for i in range(random.randint(1, 5))],
+        # Можно оставить как есть, если это поле нужно
+        "actors_names": [fake.name() for i in range(random.randint(1, 5))],
+        # Можно оставить как есть, если это поле нужно
+        "writers_names": [fake.name() for i in range(random.randint(1, 5))],
+        # Можно оставить как есть, если это поле нужно
+        "directors": [{"id": fake.uuid4(), "name": fake.name()} for _ in range(random.randint(1, 3))],
+        "actors": [{"id": fake.uuid4(), "name": fake.name()} for _ in range(random.randint(1, 5))],
+        "writers": [{"id": fake.uuid4(), "name": fake.name()} for _ in range(random.randint(1, 3))],
         "created": fake.date_time(),
         "file_link": fake.file_path()
     }
@@ -116,7 +123,7 @@ def bulk_insert_documents(num_docs):
     actions = []
     for _ in range(num_docs):
         actions.append({
-            "_index": "movies",
+            "_index": ELASTIC_INDEX,
             "_source": generate_document()
         })
 

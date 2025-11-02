@@ -31,15 +31,6 @@ services:
 #      - elasticsearch
 #    restart: always
 
-  faker:
-    build: faker
-    image: faker:latest
-    container_name: faker
-    env_file:
-      - .env
-    depends_on:
-      - elasticsearch
-
   redis:
     image: redislabs/redismod:latest
     container_name: redis
@@ -66,7 +57,24 @@ services:
       retries: 3
     depends_on:
       - redis
-      - faker
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    image: tests:latest
+    container_name: tests
+    volumes:
+      - ./tests:/opt/app/tests:ro
+    env_file:
+      - ./.env
+    entrypoint: >
+      sh -c "python3 functional/utils/wait_for_es.py
+      && python3 functional/utils/wait_for_redis.py
+      && pytest -v -W ignore::DeprecationWarning
+      && tail -f /dev/null"
+    depends_on:
+      - fastapi
 
 volumes:
   redis_data:
