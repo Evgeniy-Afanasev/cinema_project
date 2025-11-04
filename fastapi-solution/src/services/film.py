@@ -28,30 +28,6 @@ class FilmService(ElasticDataStorage[Film]):
         query_body = await self._enrich_query_with_search(film_filter, query_body, "title")
         return query_body
 
-    async def _make_person_films_query(self, base_filter: BaseFilter, person_id: str) -> dict[str, Any]:
-        query_body = await super()._make_query(base_filter)
-        query_body["query"]["bool"]["should"] = [
-            {
-                "nested": {
-                    "path": role,
-                    "query": {
-                        "match": {
-                            f"{role}.uuid": person_id
-                        }
-                    }
-                }
-            } for role in ["actors", "writers", "directors"]
-        ]
-        return query_body
-
-    async def get_person_films(self, base_filter: BaseFilter, person_id: str) -> list[Film]:
-        query_body = await self._make_person_films_query(base_filter, person_id)
-        try:
-            doc = await self.elastic.search(index=self.index, body=query_body)
-        except NotFoundError:
-            return []
-        return [Film(**film["_source"]) for film in doc["hits"]["hits"]]
-
 
 @lru_cache()
 def get_film_service(
