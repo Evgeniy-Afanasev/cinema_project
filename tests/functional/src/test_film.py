@@ -3,8 +3,8 @@ from aiohttp import ClientSession
 from http import HTTPStatus
 from functional.settings import test_settings
 
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
 async def test_film_not_found(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -14,7 +14,6 @@ async def test_film_not_found(http_session: ClientSession, es_ready):
         assert resp.status == HTTPStatus.NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_get_film_by_id(http_session: ClientSession, es_ready):
     # Arrange
     film_id = "ec1a0b58-0814-4369-ac44-cbefa03f8f96"
@@ -30,7 +29,6 @@ async def test_get_film_by_id(http_session: ClientSession, es_ready):
     assert data["uuid"] == film_id
 
 
-@pytest.mark.asyncio
 async def test_get_all_films_page_1(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -48,7 +46,6 @@ async def test_get_all_films_page_1(http_session: ClientSession, es_ready):
         assert "uuid" in data[0]
 
 
-@pytest.mark.asyncio
 async def test_get_all_films_page_2(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -66,7 +63,6 @@ async def test_get_all_films_page_2(http_session: ClientSession, es_ready):
         assert "uuid" in data[0]
 
 
-@pytest.mark.asyncio
 async def test_get_all_films_last_page(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -84,7 +80,6 @@ async def test_get_all_films_last_page(http_session: ClientSession, es_ready):
         assert "uuid" in data[0]
 
 
-@pytest.mark.asyncio
 async def test_film_cache(http_session: ClientSession, redis_client, es_ready):
     # Arrange
     film_id = "ec1a0b58-0814-4369-ac44-cbefa03f8f96"

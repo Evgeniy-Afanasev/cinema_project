@@ -8,4 +8,4 @@
 > docker compose -f docker-compose.yml -f docker-compose.tests.yml down -v
 
 # Api doc:
-> http://localhost:8000/api/openapi
+> http://localhost/api/openapi

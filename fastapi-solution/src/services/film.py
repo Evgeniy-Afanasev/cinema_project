@@ -1,40 +1,21 @@
 from functools import lru_cache
 from typing import Any
-
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from redis.asyncio import Redis
-from fastapi import Request
+from fastapi import Request, Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from fastapi import Depends
 from models.film import Film
 from queries.base import BaseFilter
-from queries.film import FilmFilter
-from services.base import BaseService
+from queries.film import SearchFilmFilter, FilmFilter
+from services.abstract import AbstractCache, AbstractDataStorage
+from services.redis import RedisCache
+from services.elastic import ElasticDataStorage
 
 
-class FilmService(BaseService):
-    """
-    Service class for interacting with Elasticsearch and Redis to retrieve and cache film data.
-
-    Parameters:
-    - redis (Redis): An instance of the Redis client for caching purposes.
-    - elastic (AsyncElasticsearch): An instance of the AsyncElasticsearch client for interacting with Elasticsearch.
-    - model_class (Type[Film]): The Pydantic BaseModel subclass representing the film data model.
-    - index (str): The Elasticsearch index for film data.
-    """
-
-    async def _make_query(self, film_filter: FilmFilter) -> dict:
-        """
-        Construct the extended Elasticsearch query body based on the provided film filter with pagination.
-
-        Parameters:
-        - film_filter (FilmFilter): An instance of FilmFilter containing filtering parameters.
-
-        Returns:
-        - The Elasticsearch query body.
-        """
+class FilmService(ElasticDataStorage[Film]):
+    async def _make_query(self, film_filter: FilmFilter) -> dict[str, Any]:
         query_body = await super()._make_query(film_filter)
         if film_filter.sort:
             query_body["sort"] = [film_filter.sort]
@@ -44,23 +25,10 @@ class FilmService(BaseService):
                     "genres": [film_filter.genre]
                 }
             })
-        try:
-            query_body = await self._enrich_query_with_search(film_filter, query_body, "title")
-        except AttributeError:
-            pass
+        query_body = await self._enrich_query_with_search(film_filter, query_body, "title")
         return query_body
 
     async def _make_person_films_query(self, base_filter: BaseFilter, person_id: str) -> dict[str, Any]:
-        """
-        Generates an Elasticsearch query for retrieving films associated with a person based on the specified base filter.
-
-        Parameters:
-        - base_filter (BaseFilter): An instance of the BaseFilter class containing filter criteria.
-        - person_id (str): The unique identifier of the person.
-
-        Returns:
-        - dict[str, Any]: The Elasticsearch query body.
-        """
         query_body = await super()._make_query(base_filter)
         query_body["query"]["bool"]["should"] = [
             {
@@ -77,16 +45,6 @@ class FilmService(BaseService):
         return query_body
 
     async def get_person_films(self, base_filter: BaseFilter, person_id: str) -> list[Film]:
-        """
-        Retrieves a list of film models associated with a person using the generated Elasticsearch query.
-
-        Parameters:
-        - base_filter (BaseFilter): An instance of the BaseFilter class containing filter criteria.
-        - person_id (str): The unique identifier of the person.
-
-        Returns:
-        - list[Film]: A list of film models associated with the person.
-        """
         query_body = await self._make_person_films_query(base_filter, person_id)
         try:
             doc = await self.elastic.search(index=self.index, body=query_body)
@@ -101,20 +59,10 @@ def get_film_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
-    """
-    Dependency function to get an instance of the FilmService.
-
-    Parameters:
-    - request (Request): The request object.
-    - redis (Redis): An instance of the Redis client for caching purposes.
-    - elastic (AsyncElasticsearch): An instance of the AsyncElasticsearch client for interacting with Elasticsearch.
-
-    Returns:
-    - FilmService: An instance of the FilmService class.
-    """
+    cache = RedisCache(redis)
     return FilmService(
         request=request,
-        redis=redis,
+        cache=cache,
         elastic=elastic,
         model_class=Film,
         index='movies',

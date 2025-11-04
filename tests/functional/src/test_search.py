@@ -3,8 +3,9 @@ from aiohttp import ClientSession
 from http import HTTPStatus
 from functional.settings import test_settings
 
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
+
 async def test_search_validation_page_size(http_session: ClientSession):
     # Act
     async with http_session.get(
@@ -14,7 +15,6 @@ async def test_search_validation_page_size(http_session: ClientSession):
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_search_validation_page_number(http_session: ClientSession):
     # Act
     async with http_session.get(
@@ -24,7 +24,6 @@ async def test_search_validation_page_number(http_session: ClientSession):
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_search_validation_sort(http_session: ClientSession):
     # Act
     async with http_session.get(
@@ -34,7 +33,6 @@ async def test_search_validation_sort(http_session: ClientSession):
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_search_limit_records(http_session: ClientSession, es_ready):
     # Arrange
     phrase = "Include"
@@ -51,7 +49,6 @@ async def test_search_limit_records(http_session: ClientSession, es_ready):
     assert len(data) <= N
 
 
-@pytest.mark.asyncio
 async def test_search_by_phrase(http_session: ClientSession, es_ready):
     # Arrange
     phrase = "Include"
@@ -67,7 +64,6 @@ async def test_search_by_phrase(http_session: ClientSession, es_ready):
     assert any(phrase.lower() in f["title"].lower() for f in data)
 
 
-@pytest.mark.asyncio
 async def test_search_with_sorting_ascending(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -80,7 +76,6 @@ async def test_search_with_sorting_ascending(http_session: ClientSession, es_rea
     assert [f["imdb_rating"] for f in data_sorted] == sorted([f["imdb_rating"] for f in data_sorted])
 
 
-@pytest.mark.asyncio
 async def test_search_with_sorting_descending(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
@@ -94,7 +89,6 @@ async def test_search_with_sorting_descending(http_session: ClientSession, es_re
                                                                      reverse=True)
 
 
-@pytest.mark.asyncio
 async def test_search_cache(http_session: ClientSession, redis_client, es_ready):
     # Arrange
     phrase = "Include"
@@ -120,7 +114,6 @@ async def test_search_cache(http_session: ClientSession, redis_client, es_ready)
     assert data1 == data2
 
 
-@pytest.mark.asyncio
 async def test_search_pagination(http_session: ClientSession, es_ready):
     # Arrange
 
