@@ -8,7 +8,7 @@ pytestmark = pytest.mark.asyncio
 async def test_film_not_found(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/123"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/123"
     ) as resp:
         # Assert
         assert resp.status == HTTPStatus.NOT_FOUND
@@ -20,7 +20,7 @@ async def test_get_film_by_id(http_session: ClientSession, es_ready):
 
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/{film_id}"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/{film_id}"
     ) as resp:
         data = await resp.json()
 
@@ -32,7 +32,7 @@ async def test_get_film_by_id(http_session: ClientSession, es_ready):
 async def test_get_all_films_page_1(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/?page_number=1&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/?page_number=1&page_size=3"
     ) as resp:
         data = await resp.json()
 
@@ -49,7 +49,7 @@ async def test_get_all_films_page_1(http_session: ClientSession, es_ready):
 async def test_get_all_films_page_2(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/?page_number=2&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/?page_number=2&page_size=3"
     ) as resp:
         data = await resp.json()
 
@@ -66,7 +66,7 @@ async def test_get_all_films_page_2(http_session: ClientSession, es_ready):
 async def test_get_all_films_last_page(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/?page_number=4&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/?page_number=4&page_size=3"
     ) as resp:
         data = await resp.json()
 
@@ -87,7 +87,7 @@ async def test_film_cache(http_session: ClientSession, redis_client, es_ready):
 
     # Act 1
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/{film_id}"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/{film_id}"
     ) as resp1:
         data1 = await resp1.json()
 
@@ -98,7 +98,7 @@ async def test_film_cache(http_session: ClientSession, redis_client, es_ready):
 
     # Act 2
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/{film_id}"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/{film_id}"
     ) as resp2:
         data2 = await resp2.json()
 

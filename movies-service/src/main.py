@@ -14,6 +14,7 @@ from routes import health
 async def lifespan(app: FastAPI):
     redis.redis = Redis(host=settings.redis_host, port=settings.redis_port)
     elastic.es = AsyncElasticsearch(hosts=[f'{settings.elastic_schema}{settings.elastic_host}:{settings.elastic_port}'])
+
     yield
 
     await redis.redis.close()
@@ -21,11 +22,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.project_name,
+    title='movies-api',
+    description='API кинотеатра',
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
+    root_path="/movies"
 )
 
 app.include_router(health.router, tags=['health'])

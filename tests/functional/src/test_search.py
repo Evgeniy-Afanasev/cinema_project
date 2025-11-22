@@ -9,7 +9,7 @@ pytestmark = pytest.mark.asyncio
 async def test_search_validation_page_size(http_session: ClientSession):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?page_size=-1"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?page_size=-1"
     ) as resp:
         # Assert
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -18,7 +18,7 @@ async def test_search_validation_page_size(http_session: ClientSession):
 async def test_search_validation_page_number(http_session: ClientSession):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?page_number=-1"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?page_number=-1"
     ) as resp:
         # Assert
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -27,7 +27,7 @@ async def test_search_validation_page_number(http_session: ClientSession):
 async def test_search_validation_sort(http_session: ClientSession):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?sort=-1"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?sort=-1"
     ) as resp:
         # Assert
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -40,7 +40,7 @@ async def test_search_limit_records(http_session: ClientSession, es_ready):
 
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?query={phrase}&page_size={N}"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?query={phrase}&page_size={N}"
     ) as resp:
         data = await resp.json()
 
@@ -55,7 +55,7 @@ async def test_search_by_phrase(http_session: ClientSession, es_ready):
 
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?query={phrase}&page=1&size=5"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?query={phrase}&page=1&size=5"
     ) as resp:
         data = await resp.json()
 
@@ -67,7 +67,7 @@ async def test_search_by_phrase(http_session: ClientSession, es_ready):
 async def test_search_with_sorting_ascending(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?sort=imdb_rating&page=1&size=10"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?sort=imdb_rating&page=1&size=10"
     ) as resp:
         data_sorted = await resp.json()
 
@@ -79,7 +79,7 @@ async def test_search_with_sorting_ascending(http_session: ClientSession, es_rea
 async def test_search_with_sorting_descending(http_session: ClientSession, es_ready):
     # Act
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?sort=-imdb_rating&page=1&size=10"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?sort=-imdb_rating&page=1&size=10"
     ) as resp:
         data_sorted_reverse = await resp.json()
 
@@ -96,7 +96,7 @@ async def test_search_cache(http_session: ClientSession, redis_client, es_ready)
 
     # Act 1
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?query={phrase}&page_number=1&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?query={phrase}&page_number=1&page_size=3"
     ) as resp1:
         data1 = await resp1.json()
 
@@ -105,7 +105,7 @@ async def test_search_cache(http_session: ClientSession, redis_client, es_ready)
 
     # Act 2
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?query={phrase}&page_number=1&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?query={phrase}&page_number=1&page_size=3"
     ) as resp2:
         data2 = await resp2.json()
 
@@ -119,19 +119,19 @@ async def test_search_pagination(http_session: ClientSession, es_ready):
 
     # Act 1 - First page
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?page_number=1&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?page_number=1&page_size=3"
     ) as resp1:
         data1 = await resp1.json()
 
     # Act 2 - Second page
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?page_number=2&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?page_number=2&page_size=3"
     ) as resp2:
         data2 = await resp2.json()
 
     # Act 3 - Third page
     async with http_session.get(
-            f"http://{test_settings.service_host}:{test_settings.service_port}/api/v1/films/search?page_number=3&page_size=3"
+            f"http://{test_settings.movies_api_service_host}:{test_settings.movies_api_service_port}/api/v1/films/search?page_number=3&page_size=3"
     ) as resp3:
         data3 = await resp3.json()
 

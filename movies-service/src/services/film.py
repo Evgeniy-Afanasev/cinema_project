@@ -30,11 +30,7 @@ class FilmService(ElasticDataStorage[Film]):
 
 
 @lru_cache()
-def get_film_service(
-        request: Request,
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> FilmService:
+def get_film_service(request: Request, redis: Redis = Depends(get_redis), elastic: AsyncElasticsearch = Depends(get_elastic),) -> FilmService:
     cache = RedisCache(redis)
     return FilmService(
         request=request,

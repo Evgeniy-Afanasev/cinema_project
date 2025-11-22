@@ -41,10 +41,10 @@ async def redis_client(event_loop):
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def setup_es(es_client):
-    if await es_client.indices.exists(index=test_settings.elastic_index):
-        await es_client.indices.delete(index=test_settings.elastic_index)
+    if await es_client.indices.exists(index=test_settings.elastic_movies_index):
+        await es_client.indices.delete(index=test_settings.elastic_movies_index)
 
-    await es_client.indices.create(index=test_settings.elastic_index, body=MOVIES_MAPPING)
+    await es_client.indices.create(index=test_settings.elastic_movies_index, body=MOVIES_MAPPING)
 
     actions = []
     with open("functional/testdata/data.json", "r", encoding="utf-8") as f:
@@ -61,7 +61,7 @@ async def setup_es(es_client):
                 raise ValueError(f"Не найден ID в документе: {doc}")
 
             actions.append({
-                "_index": test_settings.elastic_index,
+                "_index": test_settings.elastic_movies_index,
                 "_id": doc_id,
                 "_source": source,
             })
@@ -76,7 +76,7 @@ async def setup_es(es_client):
         if errors:
             logger.warning(f"Ошибки при загрузке данных в ES: {errors}")
 
-    count = await es_client.count(index=test_settings.elastic_index)
+    count = await es_client.count(index=test_settings.elastic_movies_index)
     assert count["count"] > 0, "Не удалось загрузить данные в elasticsearch"
     logger.info(f"Загружено {count['count']} документов в ES")
 
