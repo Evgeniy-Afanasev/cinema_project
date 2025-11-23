@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from core.messages import FILM_NOT_FOUND
 from queries.film import FilmFilter, SearchFilmFilter
 from services.film import FilmService, get_film_service

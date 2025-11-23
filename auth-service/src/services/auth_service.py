@@ -1,11 +1,10 @@
-import datetime
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models.models import User, LoginHistory
 from utils.security import hash_password, verify_password
 from utils.jwt import create_access_token
-from utils.token_cache import cache_refresh_token, get_user_id_by_refresh, revoke_refresh_token, revoke_user_refresh
+from utils.token_cache import cache_refresh_token, get_user_id_by_refresh, revoke_refresh_token
 from core.config import settings
 
 

@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import (
-    Column, Integer, String, DateTime, Boolean, ForeignKey, Table, Text, UniqueConstraint
+    Column, Integer, String, DateTime, Boolean, ForeignKey, Table, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 from db.postgres import Base
@@ -12,6 +12,7 @@ user_roles = Table(
     Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
     UniqueConstraint("user_id", "role_id", name="uq_user_role"),
 )
+
 
 class User(Base):
     __tablename__ = "users"

@@ -1,15 +1,13 @@
 from functools import lru_cache
 from typing import Any
-from elasticsearch import AsyncElasticsearch, NotFoundError
+from elasticsearch import AsyncElasticsearch
 from redis.asyncio import Redis
 from fastapi import Request, Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
-from queries.base import BaseFilter
-from queries.film import SearchFilmFilter, FilmFilter
-from services.abstract import AbstractCache, AbstractDataStorage
+from queries.film import FilmFilter
 from services.redis import RedisCache
 from services.elastic import ElasticDataStorage
 

@@ -3,6 +3,7 @@ from sqlalchemy import select
 from models.models import Role, User
 from schemas.auth import RoleCreate
 
+
 class RoleService:
     """Сервис управления ролями: CRUD, назначение/отбор, проверка прав."""
 

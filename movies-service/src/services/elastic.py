@@ -1,6 +1,6 @@
-from typing import Any, Union, Type, Generic, TypeVar
+from typing import Any, Type, Generic, TypeVar
 from elasticsearch import AsyncElasticsearch, NotFoundError
-from fastapi import Request, Depends
+from fastapi import Request
 from services.abstract import AbstractCache, AbstractDataStorage
 from queries.base import BaseFilter
 from urllib.parse import urlencode

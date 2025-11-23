@@ -20,6 +20,7 @@ app = FastAPI(
     docs_url='/docs',
     openapi_url='/openapi.json',
     lifespan=lifespan,
+    root_path="/auth"
 )
 
 app.include_router(auth.router, prefix='/auth', tags=["auth"])

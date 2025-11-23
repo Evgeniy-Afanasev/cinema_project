@@ -12,7 +12,7 @@
 > python create_superuser.py --email email@email.com --login login --password pass
 
 # movies api doc:
-> http://localhost:8000/movies/api/openapi#/
+> http://localhost/movies/api/openapi#/
 
 # auth doc
-> http://localhost:8001/docs#/
+> http://localhost/auth/docs#/

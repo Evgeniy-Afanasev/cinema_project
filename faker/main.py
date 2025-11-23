@@ -1,4 +1,3 @@
-import json
 import time
 from elasticsearch import Elasticsearch, helpers
 from faker import Faker
@@ -141,4 +140,4 @@ def bulk_insert_documents(num_docs):
 
 bulk_insert_documents(GENERATE_DOCS)
 
-print(f"Документы успешно добавлены.")
+print("Документы успешно добавлены.")
